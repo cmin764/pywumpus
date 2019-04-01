@@ -1,0 +1,407 @@
+--- pywumpus.py	(original)
++++ pywumpus.py	(refactored)
+@@ -1,12 +1,13 @@
+ #!/usr/bin/python
+ # $Id$
+-"""
++u"""
+ A faithful translation of the classic "Hunt The Wumpus" into Python 3.
+ """
+-__version__ = '1.0'
+-__author__ = ('Lance Finn Helsten <helsten@acm.org>',)
+-__copyright__ = "Copyright (C) 2014 Lance Finn Helsten, All rights reserved."
+-__license__ = """
++from __future__ import absolute_import
++__version__ = u'1.0'
++__author__ = (u'Lance Finn Helsten <helsten@acm.org>',)
++__copyright__ = u"Copyright (C) 2014 Lance Finn Helsten, All rights reserved."
++__license__ = u"""
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ 
+@@ -29,16 +30,16 @@
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ THE POSSIBILITY OF SUCH DAMAGE.
+ """
+-__docformat__ = "restructuredtext en"
++__docformat__ = u"restructuredtext en"
+ 
+ import sys
+ if sys.version_info < (3,):
+-    raise Exception("Wumpus requires Python 3.0 or higher.")
++    raise Exception(u"Wumpus requires Python 3.0 or higher.")
+ import os
+ import random
+ from optparse import OptionParser
+ 
+-PURPOSE = """
++PURPOSE = u"""
+ I originally did a simple translation from BASIC into Python for the fun of
+ it. I remember this game from when I when I wrote my first program at the
+ University of Utah "Kids, Turtles, and Computers" class when I was 8 in 1974.
+@@ -50,7 +51,7 @@
+ in introductory computer science courses.
+ """
+ 
+-MODIFICATIONS = """
++MODIFICATIONS = u"""
+ I have tried to stay as truthful to the original game as possible, but I had
+ to tinker because if it isn't broke then I haven't played with it enough yet.
+ 
+@@ -66,7 +67,7 @@
+     http://www.flyingtitans.com/products/wumpus/wumpus_BASIC.py
+ """
+ 
+-INSTRUCTIONS = """
++INSTRUCTIONS = u"""
+ Welcome to 'Hunt the Wumpus'.
+ 
+ The Wumpus lives in a cave of 20 rooms. Each room has three tunnels leading
+@@ -99,13 +100,13 @@
+ """
+ 
+ class WumpusKilled(Exception):
+-    """This will be thrown when a player kills the wumpus."""
++    u"""This will be thrown when a player kills the wumpus."""
+ 
+ class PlayerDeath(Exception):
+-    """This will be thrown when a player dies for any reason."""
+-
+-class Room():
+-    """This is a single room in the dodecahedron cave complex. It knows its
++    u"""This will be thrown when a player dies for any reason."""
++
++class Room(object):
++    u"""This is a single room in the dodecahedron cave complex. It knows its
+     neighboring caves and if it is a pit, has a wumpus, or bats.
+ 
+     Properties
+@@ -127,14 +128,14 @@
+         self.wumpus = False
+         self.hazard = self.EMPTY
+ 
+-    EMPTY = 'empty'
+-    WUMPUS = 'wumpus'
+-    BATS = 'bats'
+-    PIT = 'pit'
+-    WARNINGS = {EMPTY:'',
+-                WUMPUS:"I smell a Wumpus.",
+-                BATS:"Bats nearby.",
+-                PIT:"I feel a draft."}
++    EMPTY = u'empty'
++    WUMPUS = u'wumpus'
++    BATS = u'bats'
++    PIT = u'pit'
++    WARNINGS = {EMPTY:u'',
++                WUMPUS:u"I smell a Wumpus.",
++                BATS:u"Bats nearby.",
++                PIT:u"I feel a draft."}
+ 
+     @property
+     def wumpus(self):
+@@ -151,7 +152,7 @@
+     @bats.setter
+     def bats(self, value):
+         if value:
+-            assert self.hazard == self.EMPTY, "Only an empty room can be given bats."
++            assert self.hazard == self.EMPTY, u"Only an empty room can be given bats."
+             self.hazard = self.BATS
+         else:
+             self.hazard = self.EMPTY
+@@ -163,7 +164,7 @@
+     @pit.setter
+     def pit(self, value):
+         if value:
+-            assert self.hazard == self.EMPTY, "Only an empty room can be changed to a pit."
++            assert self.hazard == self.EMPTY, u"Only an empty room can be changed to a pit."
+             self.hazard = self.PIT
+         else:
+             self.hazard = self.EMPTY
+@@ -181,20 +182,20 @@
+         ret = [self.WARNINGS[r.hazard] for r in self.neighbors]
+         if [r for r in self.neighbors if r.wumpus]:
+             ret.insert(0, self.WARNINGS[self.WUMPUS])
+-        ret = ['    ' + r for r in ret if r]
+-        ret.insert(0, "You are in room {0}.".format(self.name))
+-        ret.append("Tunnels lead to {0}, {1}, {2}.".format(*[n.name for n in self.neighbors]))
++        ret = [u'    ' + r for r in ret if r]
++        ret.insert(0, u"You are in room {0}.".format(self.name))
++        ret.append(u"Tunnels lead to {0}, {1}, {2}.".format(*[n.name for n in self.neighbors]))
+         return os.linesep.join(ret)
+ 
+     def __repr__(self):
+-        return "<Room {0} tunnels:[{1}, {2}, {3}] wumpus:{4} hazard:{5}>".format(
++        return u"<Room {0} tunnels:[{1}, {2}, {3}] wumpus:{4} hazard:{5}>".format(
+             self.name,
+             self.neighbors[0].name, self.neighbors[1].name, self.neighbors[2].name,
+             self.wumpus, self.hazard)
+ 
+ 
+-class Cave():
+-    """This is the cave of twenty rooms in the form of a dodecahedron.
++class Cave(object):
++    u"""This is the cave of twenty rooms in the form of a dodecahedron.
+ 
+     I would have used a graph system to do the work for me, but I wanted this
+     to be a completly stand alone system. I will leave it as an exercise for
+@@ -209,7 +210,7 @@
+     """
+     def __init__(self):
+         # Layout the cave complex
+-        self.__rooms = [Room(i + 1) for i in range(0, 20)]
++        self.__rooms = [Room(i + 1) for i in xrange(0, 20)]
+         layout = ((1,4,7),    (0,2,9),   (1,3,11),   (2,4,13),   (0,3,5),
+                   (4,6,14),   (5,7,16),  (0,6,8),    (7,9,17),   (1,8,10),
+                   (9,11,18),  (2,10,12), (11,13,19), (3,12,14),  (5,13,15),
+@@ -218,29 +219,29 @@
+             self.__rooms[i].neighbors = tuple([self.rooms[i] for i in l])
+ 
+         # Install the hazards
+-        self.__init_hazard("pit")
+-        self.__init_hazard("pit")
+-        self.__init_hazard("bats")
+-        self.__init_hazard("bats")
++        self.__init_hazard(u"pit")
++        self.__init_hazard(u"pit")
++        self.__init_hazard(u"bats")
++        self.__init_hazard(u"bats")
+ 
+         # Place the wumpus
+         random.choice(self.rooms).wumpus = True
+ 
+     def __init_hazard(self, field):
+-        """Initialize a single hazard in a random room."""
++        u"""Initialize a single hazard in a random room."""
+         room = random.choice(self.rooms)
+         while room.bats or room.pit:
+             room = random.choice(self.rooms)
+         setattr(room, field, True)
+ 
+     def placeplayer(self):
+-        """Randomly place a player in the cave where there is no hazard."""
++        u"""Randomly place a player in the cave where there is no hazard."""
+         self.__player = random.choice(self.rooms)
+         while self.player.wumpus or self.player.bats or self.player.pit:
+             self.__player = random.choice(self.rooms)
+ 
+     def shoot(self):
+-        """Let the player shoot an arrow.
++        u"""Let the player shoot an arrow.
+ 
+         Exception
+         --------
+@@ -251,12 +252,12 @@
+         """
+         arrow = self.player
+         last = arrow
+-        dist = self.__readint("No. of Rooms (1-5)?", 1, 5)
+-        for cnt in range(dist):
+-            to = self.__readcave("Room #")
++        dist = self.__readint(u"No. of Rooms (1-5)?", 1, 5)
++        for cnt in xrange(dist):
++            to = self.__readcave(u"Room #")
+             while to == last:
+-                print("Arrows aren't that crooked-try another room.")
+-                to = self.__readcave("Room #")
++                print u"Arrows aren't that crooked-try another room."
++                to = self.__readcave(u"Room #")
+ 
+             if to in arrow:
+                 arrow = to
+@@ -264,14 +265,14 @@
+                 arrow = random.choice(arrow)
+ 
+             if arrow == self.player:
+-                raise PlayerDeath("Ouch! Arrow got you!")
++                raise PlayerDeath(u"Ouch! Arrow got you!")
+             elif arrow.wumpus:
+-                raise WumpusKilled("AHA! You got the wumpus!")
+-        print("Missed.")
++                raise WumpusKilled(u"AHA! You got the wumpus!")
++        print u"Missed."
+         self.__movewumpus()
+ 
+     def move(self):
+-        """Move the player to another room. Deal with any hazards in the new room.
++        u"""Move the player to another room. Deal with any hazards in the new room.
+ 
+         Exception
+         --------
+@@ -279,15 +280,15 @@
+             The player died a horrible a terrible death which needs to be
+             reported.
+         """
+-        room = self.__readcave("Where to?")
++        room = self.__readcave(u"Where to?")
+         if room not in self.player:
+-            print("Not Possible.")
++            print u"Not Possible."
+         else:
+             self.__player = room
+             self.__move0()
+ 
+     def __move0(self):
+-        """Check to see if the player is in a room with a hazard, handle the
++        u"""Check to see if the player is in a room with a hazard, handle the
+         hazard, and if the player is moved then recursively check for a new
+         hazard.
+ 
+@@ -304,15 +305,15 @@
+             reported.
+         """
+         if self.player.wumpus:
+-            print("... OOPS! Bumped a Wumpus!")
++            print u"... OOPS! Bumped a Wumpus!"
+             if random.random() < 0.75:
+                 self.__movewumpus()
+             else:
+-                raise PlayerDeath("TSK TSK TSK-Wumpus got you!")
++                raise PlayerDeath(u"TSK TSK TSK-Wumpus got you!")
+         elif self.player.pit:
+-            raise PlayerDeath("YYYYIIIIEEEE . . . Fell in a pit.")
++            raise PlayerDeath(u"YYYYIIIIEEEE . . . Fell in a pit.")
+         elif self.player.bats:
+-            print("ZAP-Super Bat Snatch! Elsewhereville for you!")
++            print u"ZAP-Super Bat Snatch! Elsewhereville for you!"
+             self.__player = random.choice(self.rooms)
+             self.__move0()
+ 
+@@ -323,26 +324,26 @@
+         mover = random.choice(wroom.neighbors)
+         mover.wumpus = True
+         if mover == self.player:
+-            raise PlayerDeath("TSK TSK TSK-Wumpus got you!")
++            raise PlayerDeath(u"TSK TSK TSK-Wumpus got you!")
+ 
+ 
+     def __readint(self, query, min, max):
+-        """Read an integer in the given range.
++        u"""Read an integer in the given range.
+ 
+         Return
+             The intenger in the given range.
+         """
+         ret = -1
+-        while ret not in range(min, max + 1):
++        while ret not in xrange(min, max + 1):
+             try:
+-                ret = input(query + " ")
++                ret = raw_input(query + u" ")
+                 ret = int(ret)
+             except ValueError:
+                 pass
+         return ret
+ 
+     def __readcave(self, query):
+-        """Ask the use which cave.
++        u"""Ask the use which cave.
+ 
+         Return
+             The name of the cave.
+@@ -368,10 +369,10 @@
+         return self.__rooms[key]
+ 
+     def __str__(self):
+-        return os.linesep.join([str(r) for r in self.rooms])
++        return os.linesep.join([unicode(r) for r in self.rooms])
+ 
+     def __repr__(self):
+-        return "<Cave {0}>".format([repr(r) for r in self.rooms])
++        return u"<Cave {0}>".format([repr(r) for r in self.rooms])
+ 
+ 
+ def run(cave):
+@@ -379,60 +380,60 @@
+         win = False
+         arrows = 5
+         while arrows > 0:
+-            print()
+-            print(cave.player)
+-            act = input("Shoot or Move (S-M)? ")[0].lower()
+-            if act == 'm':
++            print
++            print cave.player
++            act = raw_input(u"Shoot or Move (S-M)? ")[0].lower()
++            if act == u'm':
+                 cave.move()
+-            elif act == 's':
++            elif act == u's':
+                 arrows = arrows - 1
+                 cave.shoot()
+-        print("Out of ammo.")
+-        print("You Lose!")
+-    except WumpusKilled as win:
+-        print(win)
+-        print("HEE HEE HEE - The Wumpus'll get you next time!!")
+-    except PlayerDeath as lose:
+-        print(lose)
+-        print("HA HA HA-You Lose!")
+-
+-
+-if __name__ == "__main__":
++        print u"Out of ammo."
++        print u"You Lose!"
++    except WumpusKilled, win:
++        print win
++        print u"HEE HEE HEE - The Wumpus'll get you next time!!"
++    except PlayerDeath, lose:
++        print lose
++        print u"HA HA HA-You Lose!"
++
++
++if __name__ == u"__main__":
+     parser = OptionParser(
+         description=__doc__,
+-        version='%%prog %s' % (__version__,),
+-        usage='usage: %prog [options]')
+-    parser.add_option('', '--instructions',
+-            action='store_true', dest='instructions', default=False,
+-            help='instructions on how to play.')
+-    parser.add_option('', '--purpose',
+-            action='store_true', dest='purpose', default=False,
+-            help='why I did this.')
+-    parser.add_option('', '--mods',
+-            action='store_true', dest='mods', default=False,
+-            help='modifications from original Hunt the Wumpus.')
++        version=u'%%prog %s' % (__version__,),
++        usage=u'usage: %prog [options]')
++    parser.add_option(u'', u'--instructions',
++            action=u'store_true', dest=u'instructions', default=False,
++            help=u'instructions on how to play.')
++    parser.add_option(u'', u'--purpose',
++            action=u'store_true', dest=u'purpose', default=False,
++            help=u'why I did this.')
++    parser.add_option(u'', u'--mods',
++            action=u'store_true', dest=u'mods', default=False,
++            help=u'modifications from original Hunt the Wumpus.')
+     options, args = parser.parse_args()
+ 
+     if options.instructions:
+-        print(INSTRUCTIONS)
++        print INSTRUCTIONS
+ 
+     elif options.purpose:
+-        print(PURPOSE)
++        print PURPOSE
+         sys.exit(0)
+ 
+     elif options.mods:
+-        print(MODIFICATIONS)
++        print MODIFICATIONS
+         sys.exit(0)
+ 
+     else:
+-        if input("Instructions (Y-N)? ")[0].lower() == 'y':
+-            print(INSTRUCTIONS)
++        if raw_input(u"Instructions (Y-N)? ")[0].lower() == u'y':
++            print INSTRUCTIONS
+         cave = Cave()
+         try:
+             while True:
+                 cave.placeplayer()
+                 run(cave)
+-                if input("Same setup (Y-N)? ")[0].lower() == 'n':
++                if raw_input(u"Same setup (Y-N)? ")[0].lower() == u'n':
+                     cave = Cave()
+         except KeyboardInterrupt:
+             pass
