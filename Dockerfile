@@ -13,4 +13,4 @@ CMD echo "Ready installing"
 
 EXPOSE 8000
 CMD ["butterfly.server.py", "--host=0.0.0.0", "--port=8000", "--cmd=pywumpus.py", "--unsecure"]
-#ENTRYPOINT ["docker/run.sh"]
+ENTRYPOINT ["docker/run.sh"]
