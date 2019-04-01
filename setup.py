@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
-"""Hunt the Wumpus"""
-__author__ = ('Lance Finn Helsten',)
-__version__ = '1.2'
-__copyright__ = "Copyright (C) 2014 Lance Finn Helsten, All rights reserved."
-__license__ = """
+u"""Hunt the Wumpus"""
+from __future__ import absolute_import
+from io import open
+__author__ = (u'Lance Finn Helsten',)
+__version__ = u'1.2'
+__copyright__ = u"Copyright (C) 2014 Lance Finn Helsten, All rights reserved."
+__license__ = u"""
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -31,35 +33,36 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
 if sys.version_info < (3, 0):
-    raise Exception("pyzombie requires Python 3.0 or higher.")
+    #raise Exception("pyzombie requires Python 3.0 or higher.")
+    pass
 from distutils.core import setup
 
 setup(
-    name='pywumpus',
+    name=u'pywumpus',
     version=__version__,
-    author='Lance Finn Helsten',
-    author_email='lanhel@me.com',
+    author=u'Lance Finn Helsten',
+    author_email=u'lanhel@me.com',
 	#maintainer='',
     #maintainer_email='',
-    url='http://code.google.com/p/pywumpus/',
-    description='Hunt the Wumpus (1972) Python translation.',
-    long_description=open('README.rst').read(),
-    platforms=['OS Independent'],
-    download_url='http://code.google.com/p/pywumpus/downloads/list',
-    license="GNU General Public License",
+    url=u'http://code.google.com/p/pywumpus/',
+    description=u'Hunt the Wumpus (1972) Python translation.',
+    long_description=open(u'README.rst').read(),
+    platforms=[u'OS Independent'],
+    download_url=u'http://code.google.com/p/pywumpus/downloads/list',
+    license=u"GNU General Public License",
     classifiers=[
-		'Development Status :: 5 - Production/Stable',
-		'Environment :: Console',
-		'Intended Audience :: Developers',
-		'Intended Audience :: Education',
-		'Intended Audience :: End Users/Desktop',
-		'License :: OSI Approved :: GNU General Public License (GPL)',
-		'Operating System :: OS Independent',
-		'Programming Language :: Python :: 3',
-		'Topic :: Education',
-		'Topic :: Games/Entertainment'
+		u'Development Status :: 5 - Production/Stable',
+		u'Environment :: Console',
+		u'Intended Audience :: Developers',
+		u'Intended Audience :: Education',
+		u'Intended Audience :: End Users/Desktop',
+		u'License :: OSI Approved :: GNU General Public License (GPL)',
+		u'Operating System :: OS Independent',
+		u'Programming Language :: Python :: 3',
+		u'Topic :: Education',
+		u'Topic :: Games/Entertainment'
     ],
-    scripts=['pywumpus.py'],
+    scripts=[u'pywumpus.py'],
 )
 
 
